@@ -2,6 +2,7 @@
 #include <cstdlib>
 
 #include "tokens.h"
+#include "parser.h"
 
 using std::queue;
 using std::set;
@@ -20,10 +21,14 @@ int main(int argc, char** argv) {
         return EXIT_FAILURE;
     }
 
-    
-    while (!tokenlist.empty()) {
-        cout << tokenlist.front();
-        tokenlist.pop();
+    queue<Token> reversepolish = parseToRPN(tokenlist);
+    if (reversepolish.empty()) {
+        return EXIT_FAILURE;
+    }
+
+    while (!reversepolish.empty()) {
+        cout << reversepolish.front();
+        reversepolish.pop();
     }
     cout << endl;
     return EXIT_SUCCESS;
