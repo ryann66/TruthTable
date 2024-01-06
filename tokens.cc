@@ -14,35 +14,38 @@ using std::ostream;
 queue<Token> tokenize(char* input, set<char>& variables) {
     queue<Token> ret;
     variables.clear();
-    char* orig = input;
+    unsigned char len = 0; // char counter
     while (*input) {
+        len++;
         switch (*input) {
             case '~': // not
-                ret.emplace(Not);
+                ret.emplace(Not, len);
                 break;
             case '^': // and
-                ret.emplace(And);
+                ret.emplace(And, len);
                 break;
             case 'v': // or
             case 'V':
-                ret.emplace(Or);
+                ret.emplace(Or, len);
                 break;
             case '-': // implication
                 input++;
                 if (input[0] != '>') goto error;
-                ret.emplace(Implication);
+                ret.emplace(Implication, len);
+                len++;
                 break;
             case '<': // bicon
                 input++;
                 if (input[0] != '-' || input[1] != '>') goto error;
-                ret.emplace(Biconditional);
+                ret.emplace(Biconditional, len);
+                len += 2;
                 input++;
                 break;
             case '(':
-                ret.emplace(OpenParen);
+                ret.emplace(OpenParen, len);
                 break;
             case ')':
-                ret.emplace(CloseParen);
+                ret.emplace(CloseParen, len);
                 break;
             case ' ': // skip (whitespace)
             case '\r':
@@ -53,7 +56,7 @@ queue<Token> tokenize(char* input, set<char>& variables) {
                     input++;
                     goto error;
                 }
-                ret.emplace(*input);
+                ret.emplace(*input, len);
                 variables.insert(*input);
                 break;
         }
@@ -61,7 +64,7 @@ queue<Token> tokenize(char* input, set<char>& variables) {
     }
     return ret;
 error:
-    cerr << "Unknown operator at character " << (input - orig) << endl;
+    cerr << "Unknown operator at character " << (short int) len << endl;
     while (!ret.empty()) ret.pop();
     variables.clear();
     return ret;

@@ -16,13 +16,16 @@ typedef enum {
 // If type is a variable, then opt is the letter
 // Else if type is an operator, then opt is the precedence
 // Else opt is unused
+// loc is the 1 based index of the first character of the token in
+// the input string
 class Token {
 public:
     Type type;
     char opt;
+    unsigned char loc;
 
     // assign type and autogen precedence
-    Token(const Type t) : type(t) {
+    Token(const Type t, const unsigned char l) : type(t), loc(l) {
         switch (t) {
             case Not:
                 opt = 5; // unary postfix gets no precedence
@@ -44,7 +47,7 @@ public:
     }
 
     // type must be variable (assumed), assign var name to opt
-    Token(const char v) : type(Variable), opt(v) { }
+    Token(const char v, const unsigned char l) : type(Variable), opt(v), loc(l) { }
 };
 
 std::ostream& operator<<(std::ostream& os, const Token);

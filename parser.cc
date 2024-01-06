@@ -23,14 +23,15 @@ queue<Token> parseToRPN(queue<Token>& tokenlist) {
             case OpenParen:
                 shunt.push(next);
                 if (tokenlist.front().type == CloseParen) {
-                    cerr << "Empty parenthesis" << endl;
+                    cerr << "Empty parenthesis at characters " << (short int) next.loc << "-" 
+                         << (short int) tokenlist.front().loc << endl;
                     goto error;
                 }
                 break;
             case CloseParen:
             {
                 if (shunt.empty()) {
-                    cerr << "Unmatched ')'" << endl;
+                    cerr << "Unmatched ')' at character " << (short int) next.loc << endl;
                     goto error;
                 }
                 Token t = shunt.top();
@@ -39,7 +40,7 @@ queue<Token> parseToRPN(queue<Token>& tokenlist) {
                     shunt.pop();
                     polish.push(t);
                     if (shunt.empty()) {
-                        cerr << "Unmatched ')'" << endl;
+                        cerr << "Unmatched ')' at character " << (short int) next.loc << endl;
                         goto error;
                     }
                 }
@@ -68,7 +69,7 @@ queue<Token> parseToRPN(queue<Token>& tokenlist) {
     // clear any remaining operators
     while (!shunt.empty()) {
         if (shunt.top().type == OpenParen) {
-            cerr << "Unmatched '('" << endl;
+            cerr << "Unmatched '(' at character " << (short int) shunt.top().loc << endl;
             goto error;
         }
         polish.push(shunt.top());
