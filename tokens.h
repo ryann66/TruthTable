@@ -1,3 +1,5 @@
+#pragma once
+
 #include <queue>
 #include <set>
 #include <iostream>
@@ -15,15 +17,15 @@ typedef enum {
 // Else if type is an operator, then opt is the precedence
 // Else opt is unused
 class Token {
+public:
     Type type;
     char opt;
 
-public:
     // assign type and autogen precedence
     Token(const Type t) : type(t) {
         switch (t) {
             case Not:
-                opt = 5;
+                opt = 5; // unary postfix gets no precedence
                 break;
             case And:
                 opt = 4;
@@ -43,9 +45,9 @@ public:
 
     // type must be variable (assumed), assign var name to opt
     Token(const char v) : type(Variable), opt(v) { }
-
-    friend std::ostream& operator<<(std::ostream& os, const Token);
 };
+
+std::ostream& operator<<(std::ostream& os, const Token);
 
 // transforms the string input into a queue of tokens
 // saves all of the input variable names into the set variables

@@ -36,6 +36,7 @@ queue<Token> tokenize(char* input, set<char>& variables) {
                 input++;
                 if (input[0] != '-' || input[1] != '>') goto error;
                 ret.emplace(Biconditional);
+                input++;
                 break;
             case '(':
                 ret.emplace(OpenParen);
