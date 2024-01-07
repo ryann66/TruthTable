@@ -3,11 +3,10 @@
 
 #include "tokens.h"
 #include "parser.h"
+#include "errorHandler.h"
 
 using std::queue;
 using std::stack;
-using std::cerr;
-using std::endl;
 
 queue<Token> parseToRPN(queue<Token>& tokenlist) {
     queue<Token> polish;
@@ -23,15 +22,14 @@ queue<Token> parseToRPN(queue<Token>& tokenlist) {
             case OpenParen:
                 shunt.push(next);
                 if (tokenlist.front().type == CloseParen) {
-                    cerr << "Empty parenthesis at characters " << (short int) next.loc << "-" 
-                         << (short int) tokenlist.front().loc << endl;
+                    printError("Empty parenthesis", next.loc, tokenlist.front().loc);
                     goto error;
                 }
                 break;
             case CloseParen:
             {
                 if (shunt.empty()) {
-                    cerr << "Unmatched ')' at character " << (short int) next.loc << endl;
+                    printError("Unmatched ')'", next.loc);
                     goto error;
                 }
                 Token t = shunt.top();
@@ -40,7 +38,7 @@ queue<Token> parseToRPN(queue<Token>& tokenlist) {
                     shunt.pop();
                     polish.push(t);
                     if (shunt.empty()) {
-                        cerr << "Unmatched ')' at character " << (short int) next.loc << endl;
+                        printError("Unmatched ')'", next.loc);
                         goto error;
                     }
                 }
@@ -69,7 +67,7 @@ queue<Token> parseToRPN(queue<Token>& tokenlist) {
     // clear any remaining operators
     while (!shunt.empty()) {
         if (shunt.top().type == OpenParen) {
-            cerr << "Unmatched '(' at character " << (short int) shunt.top().loc << endl;
+            printError("Unmatched '('", shunt.top().loc);
             goto error;
         }
         polish.push(shunt.top());

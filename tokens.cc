@@ -4,11 +4,10 @@
 #include <ctype.h>
 
 #include "tokens.h"
+#include "errorHandler.h"
 
 using std::set;
 using std::queue;
-using std::cerr;
-using std::endl;
 using std::ostream;
 
 queue<Token> tokenize(char* input, set<char>& variables) {
@@ -64,7 +63,7 @@ queue<Token> tokenize(char* input, set<char>& variables) {
     }
     return ret;
 error:
-    cerr << "Unknown operator at character " << (short int) len << endl;
+    printError("Unknown operator", len);
     while (!ret.empty()) ret.pop();
     variables.clear();
     return ret;

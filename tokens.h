@@ -28,7 +28,7 @@ public:
     Token(const Type t, const unsigned char l) : type(t), loc(l) {
         switch (t) {
             case Not:
-                opt = 5; // unary postfix gets no precedence
+                opt = 5;
                 break;
             case And:
                 opt = 4;
