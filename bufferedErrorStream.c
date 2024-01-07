@@ -42,6 +42,7 @@ int printNum(unsigned char num) {
     int r;
     if (buffer_size + NUM_LEN >= BUFFER_LENGTH) flush();
     snprintf(buffer + buffer_size, NUM_LEN, "%hhu%n", num, &r);
+    buffer_size += r;
     return r;
 }
 

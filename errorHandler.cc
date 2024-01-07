@@ -7,6 +7,10 @@ extern "C" {
     #include "bufferedErrorStream.h"
 }
 
+#define ESCAPE "\033"
+#define RESET ESCAPE "[0m"
+#define EMPH ESCAPE "[35m"
+
 using std::string;
 using std::cerr;
 using std::endl;
@@ -27,8 +31,11 @@ void printError(string message, unsigned char loc) {
     printString("\n");
     len += loc;
     // print error squiggles
-    printRepeated(' ', len - 2);
-    printString("~\n");
+    printRepeated(' ', len - 1);
+    printString(EMPH);
+    printRepeated('~', (unsigned int) 1);
+    printString(RESET);
+    printRepeated('\n', 1);
     flush();
 }
 
@@ -44,8 +51,10 @@ void printError(string message, unsigned char beg, unsigned char end) {
     printString("\n");
     len += beg;
     // print error squiggles
-    printRepeated(' ', len - 3);
+    printRepeated(' ', len - 1);
+    printString(EMPH);
     printRepeated('~', (unsigned int) end - beg + 1);
+    printString(RESET);
     printRepeated('\n', 1);
     flush();
 }
