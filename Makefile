@@ -7,16 +7,16 @@ all: table
 table: table.o
 	$(CC) $(CFLAGS) -o table $(OBJS)
 
-table.o: table.cc tokens.o parser.o errorHandler.o
+table.o: table.cc tokens.h parser.h errorHandler.h
 	$(CC) $(CFLAGS) -c $<
 
-tokens.o: tokens.cc tokens.h errorHandler.o
+tokens.o: tokens.cc tokens.h errorHandler.h
 	$(CC) $(CFLAGS) -c $<
 
-parser.o: parser.cc parser.h tokens.o errorHandler.o
+parser.o: parser.cc parser.h tokens.h errorHandler.h
 	$(CC) $(CFLAGS) -c $<
 	
-errorHandler.o: errorHandler.cc errorHandler.h tokens.h tokens.cc bufferedErrorStream.o
+errorHandler.o: errorHandler.cc errorHandler.h tokens.h bufferedErrorStream.h
 	$(CC) $(CFLAGS) -c $<
 
 bufferedErrorStream.o: bufferedErrorStream.c bufferedErrorStream.h
