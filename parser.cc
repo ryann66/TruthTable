@@ -8,7 +8,15 @@
 using std::queue;
 using std::stack;
 
+// checks the given preposition (in reverse polish notation)
+// to ensure that it's correct / interpretable
+// returns true if it is uninterpretable
+// else it returns false
+// prints errors as it encounters them
+bool programContainsError(queue<Token> prog);
+
 queue<Token> parseToRPN(queue<Token>& tokenlist) {
+    bool error = programContainsError(tokenlist);
     queue<Token> polish;
     stack<Token> shunt;
     while (!tokenlist.empty()) {
@@ -73,9 +81,14 @@ queue<Token> parseToRPN(queue<Token>& tokenlist) {
         polish.push(shunt.top());
         shunt.pop();
     }
+    if (error) goto error;
 
     return polish;
 error:
     while (!polish.empty()) polish.pop();
     return polish;
+}
+
+bool programContainsError(queue<Token> prog) {
+    
 }
