@@ -98,3 +98,20 @@ ostream& operator<<(ostream& os, const Token t) {
     }
     return os;
 }
+
+unsigned char tokenLength(Token t) {
+    switch (t.type) {
+    case Variable:
+    case OpenParen:
+    case CloseParen:
+    case Not:
+    case And:
+    case Or:
+        return 1;
+    case Implication:
+        return 2;
+    case Biconditional:
+        return 3;
+    }
+    return 0;
+}

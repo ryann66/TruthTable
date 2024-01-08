@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include "errorHandler.h"
+#include "tokens.h"
 extern "C" {
     #include "bufferedErrorStream.h"
 }
@@ -21,9 +22,9 @@ void setInputString(const char* inputString) {
     input_string = inputString;
 }
 
-void printError(string message, unsigned char loc) {
+void printError(const char* message, unsigned char loc) {
     // print line 1
-    int len = printString(message.c_str());
+    int len = printString(message);
     len += printString(" at character ");
     len += printNum(loc);
     len += printString(":  ");
@@ -39,9 +40,10 @@ void printError(string message, unsigned char loc) {
     flush();
 }
 
-void printError(string message, unsigned char beg, unsigned char end) {
+void printError(const char* message, unsigned char beg, unsigned char end) {
+    if (beg > end) return;
     // print line 1
-    int len = printString(message.c_str());
+    int len = printString(message);
     len += printString(" at characters ");
     len += printNum(beg);
     len += printRepeated('-', 1u);
@@ -57,4 +59,18 @@ void printError(string message, unsigned char beg, unsigned char end) {
     printString(RESET);
     printRepeated('\n', 1);
     flush();
+}
+
+void printError(const char* message, const Token& loc) {
+    unsigned char len = tokenLength(loc);
+    if (len) {
+        if (len == 1) printError(message, loc.loc);
+        else printError(message, loc.loc, loc.loc + len - 1);
+    }
+}
+
+void printError(const char* message, const Token& beg, const Token& end) {
+    if (beg.loc > end.loc) return;
+    unsigned char len = tokenLength(end);
+    printError(message, beg.loc, end.loc + len - 1);
 }

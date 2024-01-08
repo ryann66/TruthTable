@@ -16,7 +16,7 @@ tokens.o: tokens.cc tokens.h errorHandler.o
 parser.o: parser.cc parser.h tokens.o errorHandler.o
 	$(CC) $(CFLAGS) -c $<
 	
-errorHandler.o: errorHandler.cc errorHandler.h bufferedErrorStream.o
+errorHandler.o: errorHandler.cc errorHandler.h tokens.h tokens.cc bufferedErrorStream.o
 	$(CC) $(CFLAGS) -c $<
 
 bufferedErrorStream.o: bufferedErrorStream.c bufferedErrorStream.h

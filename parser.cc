@@ -30,14 +30,14 @@ queue<Token> parseToRPN(queue<Token>& tokenlist) {
             case OpenParen:
                 shunt.push(next);
                 if (tokenlist.front().type == CloseParen) {
-                    printError("Empty parenthesis", next.loc, tokenlist.front().loc);
+                    printError("Empty parenthesis", next, tokenlist.front());
                     goto error;
                 }
                 break;
             case CloseParen:
             {
                 if (shunt.empty()) {
-                    printError("Unmatched ')'", next.loc);
+                    printError("Unmatched ')'", next);
                     goto error;
                 }
                 Token t = shunt.top();
@@ -46,7 +46,7 @@ queue<Token> parseToRPN(queue<Token>& tokenlist) {
                     shunt.pop();
                     polish.push(t);
                     if (shunt.empty()) {
-                        printError("Unmatched ')'", next.loc);
+                        printError("Unmatched ')'", next);
                         goto error;
                     }
                 }
@@ -75,7 +75,7 @@ queue<Token> parseToRPN(queue<Token>& tokenlist) {
     // clear any remaining operators
     while (!shunt.empty()) {
         if (shunt.top().type == OpenParen) {
-            printError("Unmatched '('", shunt.top().loc);
+            printError("Unmatched '('", shunt.top());
             goto error;
         }
         polish.push(shunt.top());
@@ -90,5 +90,5 @@ error:
 }
 
 bool programContainsError(queue<Token> prog) {
-    
+    return false;
 }

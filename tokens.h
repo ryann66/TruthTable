@@ -52,6 +52,9 @@ public:
 
 std::ostream& operator<<(std::ostream& os, const Token);
 
+// gets the length of the token (as a string)
+unsigned char tokenLength(Token t);
+
 // transforms the string input into a queue of tokens
 // saves all of the input variable names into the set variables
 // returns an empty queue on failure
