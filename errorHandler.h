@@ -19,4 +19,10 @@ void printError(const char* message, unsigned char beg, unsigned char end);
 void printError(const char* message, const Token& loc);
 
 // prints an error message, highlighting the input string enclosed between the tokens
-void printError(const char* messgae, const Token& beg, const Token& end);
+void printError(const char* message, const Token& beg, const Token& end);
+
+// prints an error message, highlighting the given token
+inline void printError(string& message, const Token& loc);
+
+// prints an error message, highlighting the input string enclosed between the tokens
+inline void printError(string& message, const Token& beg, const Token& end);

@@ -4,6 +4,7 @@
 #include <set>
 #include <iostream>
 #include <ctype.h>
+#include <climits>
 
 // Type of token
 typedef enum {
@@ -27,8 +28,8 @@ public:
     // assign type and autogen precedence
     Token(const Type t, const unsigned char l) : type(t), loc(l) {
         switch (t) {
-            case Not:
-                opt = 5;
+            case Not: // all unary operators
+                opt = UCHAR_MAX;
                 break;
             case And:
                 opt = 4;
@@ -51,6 +52,8 @@ public:
 };
 
 std::ostream& operator<<(std::ostream& os, const Token);
+
+std::string printToken(Token t);
 
 // gets the length of the token (as a string)
 unsigned char tokenLength(Token t);

@@ -9,6 +9,7 @@
 using std::set;
 using std::queue;
 using std::ostream;
+using std::string;
 
 queue<Token> tokenize(char* input, set<char>& variables) {
     queue<Token> ret;
@@ -70,33 +71,30 @@ error:
 }
 
 ostream& operator<<(ostream& os, const Token t) {
+    os << printToken(t);
+    return os;
+}
+
+string printToken(Token t) {
     switch (t.type) {
         case Variable:
-            os << t.opt;
-            break;
+            char r[2] = {t.opt, '\0'};
+            return string(r);
         case OpenParen:
-            os << "(";
-            break;
+            return "(";
         case CloseParen:
-            os << ")";
-            break;
+            return ")";
         case Not:
-            os << "~";
-            break;
+            return "~";
         case And:
-            os << "^";
-            break;
+            return "^";
         case Or:
-            os << "v";
-            break;
+            return "v";
         case Implication:
-            os << "->";
-            break;
+            return "->";
         case Biconditional:
-            os << "<->";
-            break;
+            return "<->";
     }
-    return os;
 }
 
 unsigned char tokenLength(Token t) {
