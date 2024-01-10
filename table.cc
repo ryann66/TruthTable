@@ -31,6 +31,9 @@ int main(int argc, char** argv) {
         return EXIT_FAILURE;
     }
 
+    // interpret
+    
+
     // print (temp)
     while (!reversepolish.empty()) {
         cout << reversepolish.front();
