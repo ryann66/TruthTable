@@ -4,7 +4,7 @@ OBJS = table.o tokens.o parser.o errorHandler.o bufferedErrorStream.o
 
 all: table
 
-table: table.o
+table: $(OBJS)
 	$(CC) $(CFLAGS) -o table $(OBJS)
 
 table.o: table.cc tokens.h parser.h errorHandler.h

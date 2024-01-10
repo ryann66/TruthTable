@@ -78,8 +78,10 @@ ostream& operator<<(ostream& os, const Token t) {
 string printToken(Token t) {
     switch (t.type) {
         case Variable:
+        {
             char r[2] = {t.opt, '\0'};
             return string(r);
+        }
         case OpenParen:
             return "(";
         case CloseParen:
