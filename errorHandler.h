@@ -22,7 +22,7 @@ void printError(const char* message, const Token& loc);
 void printError(const char* message, const Token& beg, const Token& end);
 
 // prints an error message, highlighting the given token
-inline void printError(string& message, const Token& loc);
+void printError(const string& message, const Token& loc);
 
 // prints an error message, highlighting the input string enclosed between the tokens
-inline void printError(string& message, const Token& beg, const Token& end);
+void printError(const string& message, const Token& beg, const Token& end);

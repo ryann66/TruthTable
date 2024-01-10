@@ -97,6 +97,7 @@ string printToken(Token t) {
         case Biconditional:
             return "<->";
     }
+    return "";
 }
 
 unsigned char tokenLength(Token t) {

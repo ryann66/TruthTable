@@ -75,10 +75,10 @@ void printError(const char* message, const Token& beg, const Token& end) {
     printError(message, beg.loc, end.loc + len - 1);
 }
 
-inline void printError(string& message, const Token& loc) {
+void printError(const string& message, const Token& loc) {
     printError(message.c_str(), loc);
 }
 
-inline void printError(string& message, const Token& beg, const Token& end) {
+void printError(const string& message, const Token& beg, const Token& end) {
     printError(message.c_str(), beg, end);
 }

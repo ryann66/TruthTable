@@ -7,34 +7,38 @@
 
 using std::queue;
 using std::stack;
+using std::string;
 
-// checks the given preposition (in reverse polish notation)
-// to ensure that it's correct / interpretable
-// returns true if it is uninterpretable
-// else it returns false
-// prints errors as it encounters them
-bool programContainsError(queue<Token> prog);
+// Simplified enumeration of different types of operators that can be parsed
+typedef enum {
+    BinaryOperator, UnaryOperator /* prefix */, Value, Open, Close
+} SimplifiedType;
+
+// function to determine the simple type of all tokens
+// Update when adding new token types to ensure class continues to function
+SimplifiedType categorizeToken(Token t);
+
+// checks that the given token list forms a valid program
+// prints out errors as found
+// returns false if error found, else true
+bool invalidProgram(queue<Token>& tokenlist);
 
 queue<Token> parseToRPN(queue<Token>& tokenlist) {
-    bool error = programContainsError(tokenlist);
-    queue<Token> polish;
+    if (tokenlist.empty()) return tokenlist;
+    queue<Token> polish, orig(tokenlist);
     stack<Token> shunt;
     while (!tokenlist.empty()) {
         Token next = tokenlist.front();
         tokenlist.pop();
-        switch (next.type) {
-            case Variable:
+        switch (categorizeToken(next)) {
+            case Value:
                 polish.push(next);
                 break;
-            case Not:
-            case OpenParen:
+            case UnaryOperator:
+            case Open:
                 shunt.push(next);
-                if (tokenlist.front().type == CloseParen) {
-                    printError("Empty parenthesis", next, tokenlist.front());
-                    goto error;
-                }
                 break;
-            case CloseParen:
+            case Close:
             {
                 if (shunt.empty()) {
                     printError("Unmatched ')'", next);
@@ -58,10 +62,7 @@ queue<Token> parseToRPN(queue<Token>& tokenlist) {
                 }
                 break;
             }
-            case And:
-            case Or:
-            case Implication:
-            case Biconditional:
+            case BinaryOperator:
             {
                 while (!shunt.empty() && shunt.top().type != OpenParen && shunt.top().opt > next.opt) {
                     polish.push(shunt.top());
@@ -81,7 +82,8 @@ queue<Token> parseToRPN(queue<Token>& tokenlist) {
         polish.push(shunt.top());
         shunt.pop();
     }
-    if (error) goto error;
+
+    if (invalidProgram(orig)) goto error;
 
     return polish;
 error:
@@ -89,6 +91,110 @@ error:
     return polish;
 }
 
-bool programContainsError(queue<Token> prog) {
-    return false;
+SimplifiedType categorizeToken(Token t) {
+    switch (t.type) {
+    case Variable:
+        return Value;
+    case OpenParen:
+        return Open;
+    case CloseParen:
+        return Close;
+    case Not:
+        return UnaryOperator;
+    case And:
+    case Or:
+    case Implication:
+    case Biconditional:
+        return BinaryOperator;
+    }
+    return Close;
+}
+
+// Follows a predefined set of rules, represented below in a CFG style
+// S -> start
+// E -> end
+// v -> variable
+// * -> binary operator
+// ~ -> prefix operator
+// ( -> open paren
+// ) -> close paren
+///////////////////////
+// S -> ~, v, (
+// v -> ), *, E
+// * -> v, (, ~
+// ~ -> (, v, ~
+// ( -> (, v, ~
+// ) -> ), *, E
+// Must end with E, else error
+bool invalidProgram(queue<Token>& tokenlist) {
+    if (tokenlist.empty()) return true;
+    bool buggy = false;
+    Token prev = tokenlist.front();
+    tokenlist.pop();
+    SimplifiedType prevType = categorizeToken(prev);
+    
+    //  bootload start (Close cannot appear because it is caught in parsing)
+    if (prevType == BinaryOperator) {
+        printError("Leading binary operator '" + printToken(prev) + "'", prev);
+        buggy = true;
+    }
+    
+    while (!tokenlist.empty()) {
+        Token next = tokenlist.front();
+        SimplifiedType nextType = categorizeToken(next);
+        tokenlist.pop();
+
+        // main logic check
+        switch (prevType) {
+        case BinaryOperator:
+            if (nextType == Close) {
+                printError("Binary operator '" + printToken(prev) + "' expected an expression", prev, next);
+                buggy = true;
+            } else if (nextType == BinaryOperator) {
+                printError("Binary operators '" + printToken(prev) + "' and '" + printToken(next) + "' expected an expression", prev, next);
+                buggy = true;
+            }
+            break;
+        case UnaryOperator:
+            if (nextType == Close || nextType == BinaryOperator) {
+                printError("Unary operator '" + printToken(prev) + "' expected an expression", prev, next);
+                buggy = true;
+            }
+            break;
+        case Value:
+        case Close:
+            if (nextType == Value || nextType == Open) {
+                printError("Missing operator between expressions", prev, next);
+                buggy = true;
+            } else if (nextType == UnaryOperator) {
+                printError("Illegal suffix operator '" + printToken(next) + "' used", next);
+                buggy = true;
+            }
+            break;
+        case Open:
+            // cannot be followed by close (parsing guarantee)
+            if (nextType == BinaryOperator) {
+                printError("Binary operator '" + printToken(prev) + "' expected an expression", prev, next);
+                buggy = true;
+            }
+            break;
+        }
+
+        prev = next;
+        prevType = nextType;
+    }
+
+    // check end (open cannot appear because it is caught in parsing)
+    switch (prevType) {
+    case BinaryOperator:
+        printError("Trailing binary operator '" + printToken(prev) + "'", prev);
+        buggy = true;
+        break;
+    case UnaryOperator:
+        printError("Trailing unary operator '" + printToken(prev) + "'", prev);
+        buggy = true;
+        break;
+    }
+
+    return buggy;
 }
