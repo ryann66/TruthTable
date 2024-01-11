@@ -1,4 +1,5 @@
 #include <cstddef>
+#include <memory>
 
 #include "bitSequence.h"
 
@@ -7,38 +8,68 @@
 #define INDEX_OF_LONG_BYTE(b) ((b) / (LONG_BYTE_LEN))
 #define INDEX_OF_BIT(b) ((b) % (LONG_BYTE_LEN))
 
+using std::shared_ptr;
+
 BitSequence::BitSequence(size_t len, size_t altLen) : len(len) {
+    longByte* tmp = new longByte[arrlen()];
     
+    // TODO: initialize/alternate
+
+    bits.reset(tmp);
 }
 
-BitSequence::BitSequence(size_t len) : len(len) {
+BitSequence::BitSequence(size_t len) : len(len), bits(new longByte[arrlen()]) { }
 
-}
-
-BitSequence::BitSequence(const BitSequence& other) {
-
-}
+BitSequence::BitSequence(const BitSequence& other) : len(other.len), bits(other.bits) { }
 
 BitSequence& BitSequence::operator= (const BitSequence& other) {
-
+    len = other.len;
+    bits = other.bits;
 }
 
 bool BitSequence::operator[] (size_t bit) const {
+    //todo
+}
 
+size_t BitSequence::arrlen() const {
+    return len / LONG_BYTE_LEN + ((len % LONG_BYTE_LEN) ? 1 : 0);
 }
 
 BitSequence operator| (const BitSequence& lhs, const BitSequence& rhs) {
-
+    if (lhs.len != rhs.len) return BitSequence();
+    size_t l = lhs.arrlen();
+    BitSequence r(l);
+    for (size_t i = 0; i < l; i++) {
+        r.bits.get()[i] = lhs.bits.get()[i] | rhs.bits.get()[i];
+    }
+    return r;
 }
 
 BitSequence operator& (const BitSequence& lhs, const BitSequence& rhs) {
-
+    if (lhs.len != rhs.len) return BitSequence();
+    size_t l = lhs.arrlen();
+    BitSequence r(l);
+    for (size_t i = 0; i < l; i++) {
+        r.bits.get()[i] = lhs.bits.get()[i] & rhs.bits.get()[i];
+    }
+    return r;
 }
 
 BitSequence operator^ (const BitSequence& lhs, const BitSequence& rhs) {
-
+    if (lhs.len != rhs.len) return BitSequence();
+    size_t l = lhs.arrlen();
+    BitSequence r(l);
+    for (size_t i = 0; i < l; i++) {
+        r.bits.get()[i] = lhs.bits.get()[i] ^ rhs.bits.get()[i];
+    }
+    return r;
 }
 
 BitSequence operator~ (const BitSequence& lb) {
-
+    size_t l = lb.arrlen();
+    BitSequence r(l);
+    for (size_t i = 0; i < l; i++) {
+        r.bits.get()[i] = ~(lb.bits.get()[i]);
+    }
+    return r;
 }
