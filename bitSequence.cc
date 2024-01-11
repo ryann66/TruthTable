@@ -10,12 +10,29 @@
 
 using std::shared_ptr;
 
-BitSequence::BitSequence(size_t len, size_t altLen) : len(len) {
-    longByte* tmp = new longByte[arrlen()];
-    
-    // TODO: initialize/alternate
-
-    bits.reset(tmp);
+BitSequence::BitSequence(size_t len, size_t altLen) : len(len), bits(new longByte[arrlen()]) {
+    longByte* tmp = bits.get();
+    size_t mask = 0b1;
+    for (size_t i = 0; i < len;) {
+        for (size_t j = 0; j < altLen && i < len; j++) {
+            if (!mask) {
+                mask = 0b1;
+                tmp++;
+            }
+            *tmp &= (~mask);
+            mask <<= 1;
+            i++;
+        }
+        for (size_t j = 0; j < altLen && i < len; j++) {
+            if (!mask) {
+                mask = 0b1;
+                tmp++;
+            }
+            *tmp |= mask;
+            mask <<= 1;
+            i++;
+        }
+    }
 }
 
 BitSequence::BitSequence(size_t len) : len(len), bits(new longByte[arrlen()]) { }
@@ -25,10 +42,15 @@ BitSequence::BitSequence(const BitSequence& other) : len(other.len), bits(other.
 BitSequence& BitSequence::operator= (const BitSequence& other) {
     len = other.len;
     bits = other.bits;
+    return *this;
 }
 
 bool BitSequence::operator[] (size_t bit) const {
-    //todo
+    longByte major = bits.get()[INDEX_OF_LONG_BYTE(bit)];
+    size_t minor = INDEX_OF_BIT(bit);
+    size_t mask = 0b1;
+    mask <<= minor;
+    return major & mask;
 }
 
 size_t BitSequence::arrlen() const {
@@ -37,9 +59,8 @@ size_t BitSequence::arrlen() const {
 
 BitSequence operator| (const BitSequence& lhs, const BitSequence& rhs) {
     if (lhs.len != rhs.len) return BitSequence();
-    size_t l = lhs.arrlen();
-    BitSequence r(l);
-    for (size_t i = 0; i < l; i++) {
+    BitSequence r(lhs.len);
+    for (size_t i = 0; i < lhs.arrlen(); i++) {
         r.bits.get()[i] = lhs.bits.get()[i] | rhs.bits.get()[i];
     }
     return r;
@@ -47,9 +68,8 @@ BitSequence operator| (const BitSequence& lhs, const BitSequence& rhs) {
 
 BitSequence operator& (const BitSequence& lhs, const BitSequence& rhs) {
     if (lhs.len != rhs.len) return BitSequence();
-    size_t l = lhs.arrlen();
-    BitSequence r(l);
-    for (size_t i = 0; i < l; i++) {
+    BitSequence r(lhs.len);
+    for (size_t i = 0; i < lhs.arrlen(); i++) {
         r.bits.get()[i] = lhs.bits.get()[i] & rhs.bits.get()[i];
     }
     return r;
@@ -57,18 +77,16 @@ BitSequence operator& (const BitSequence& lhs, const BitSequence& rhs) {
 
 BitSequence operator^ (const BitSequence& lhs, const BitSequence& rhs) {
     if (lhs.len != rhs.len) return BitSequence();
-    size_t l = lhs.arrlen();
-    BitSequence r(l);
-    for (size_t i = 0; i < l; i++) {
+    BitSequence r(lhs.len);
+    for (size_t i = 0; i < lhs.arrlen(); i++) {
         r.bits.get()[i] = lhs.bits.get()[i] ^ rhs.bits.get()[i];
     }
     return r;
 }
 
 BitSequence operator~ (const BitSequence& lb) {
-    size_t l = lb.arrlen();
-    BitSequence r(l);
-    for (size_t i = 0; i < l; i++) {
+    BitSequence r(lb.len);
+    for (size_t i = 0; i < lb.arrlen(); i++) {
         r.bits.get()[i] = ~(lb.bits.get()[i]);
     }
     return r;
