@@ -32,6 +32,16 @@ int main(int argc, char** argv) {
         return EXIT_FAILURE;
     }
 
+    #ifdef DEBUG_PARSER
+    // print parser output
+    queue<Token> tmp(reversepolish);
+    while (!tmp.empty()) {
+        cout << printToken(tmp.front());
+        tmp.pop();
+    }
+    cout << endl << endl;
+    #endif
+
     // interpret
     if (printTruthTable(reversepolish, variables)){
         return EXIT_SUCCESS;

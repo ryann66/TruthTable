@@ -79,7 +79,7 @@ string printToken(Token t) {
     switch (t.type) {
         case Variable:
         {
-            char r[2] = {t.opt, '\0'};
+            char r[2] = {(char) t.opt, '\0'};
             return string(r);
         }
         case OpenParen:

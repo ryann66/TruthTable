@@ -55,16 +55,11 @@ queue<Token> parseToRPN(queue<Token>& tokenlist) {
                     }
                 }
                 shunt.pop();
-                // move any unary prefix operators into the output (only Not)
-                while (!shunt.empty() && (t = shunt.top()).type == Not) {
-                    shunt.pop();
-                    polish.push(t);
-                }
                 break;
             }
             case BinaryOperator:
             {
-                while (!shunt.empty() && shunt.top().type != OpenParen && shunt.top().opt > next.opt) {
+                while (!shunt.empty() && shunt.top().type != OpenParen && shunt.top().opt >= next.opt) {
                     polish.push(shunt.top());
                     shunt.pop();
                 }

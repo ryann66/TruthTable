@@ -22,8 +22,7 @@ typedef enum {
 class Token {
 public:
     Type type;
-    char opt;
-    unsigned char loc;
+    unsigned char opt, loc;
 
     // assign type and autogen precedence
     Token(const Type t, const unsigned char l) : type(t), loc(l) {
