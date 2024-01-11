@@ -52,7 +52,7 @@ queue<Token> tokenize(char* input, set<char>& variables) {
             case '\n':
                 break;
             default: // variable
-                if (!isalpha(*input)) {
+                if (!(isalpha(*input) || *input == '0' || *input == '1')) {
                     input++;
                     goto error;
                 }

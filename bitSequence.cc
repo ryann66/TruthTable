@@ -11,6 +11,15 @@
 using std::shared_ptr;
 
 BitSequence::BitSequence(size_t len, size_t altLen) : len(len), bits(new longByte[arrlen()]) {
+    if (altLen == 0) {
+        // initialize to 0
+        for (size_t i = 0; i < arrlen(); i++) {
+            bits.get()[i] = 0;
+        }
+        return;
+    }
+
+    // impose bit alternating
     longByte* tmp = bits.get();
     size_t mask = 0b1;
     for (size_t i = 0; i < len;) {

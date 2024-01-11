@@ -24,6 +24,8 @@ void setInputString(const char* inputString) {
 
 void printError(const string& message) {
     printString(message.c_str());
+    printRepeated('\n', 1);
+    flush();
 }
 
 void printError(const char* message, unsigned char loc) {
@@ -54,7 +56,7 @@ void printError(const char* message, unsigned char beg, unsigned char end) {
     len += printNum(end);
     len += printString(":  ");
     printString(input_string.c_str());
-    printString("\n");
+    printRepeated('\n', 1);
     len += beg;
     // print error squiggles
     printRepeated(' ', len - 1);

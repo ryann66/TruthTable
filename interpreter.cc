@@ -39,6 +39,13 @@ bool printTruthTable(queue<Token> prop, set<char> vars) {
     map<char, BitSequence> varMap;  // vars to values
     stack<BitSequence> stk;  // interpreting stack
 
+    // remove special variables from vars
+    bool zero = vars.erase('0'), one = vars.erase('1');
+    if (vars.empty()) {
+        printError("No variables detected!");
+        return false;
+    }
+
     // add variable definitions
     size_t rows = pow(2, vars.size());
     {
@@ -48,6 +55,16 @@ bool printTruthTable(queue<Token> prop, set<char> vars) {
             BitSequence bs(rows, altlen);
             varMap[c] = bs;
         }
+    }
+
+    // add special variables to var mapping
+    if (zero & one) {
+        BitSequence bs(rows, 0);
+        varMap['0'] = bs;
+        varMap['1'] = ~bs;
+    } else {
+        if (zero) varMap['0'] = BitSequence(rows, 0);
+        if (one) varMap['1'] = ~BitSequence(rows, 0);
     }
 
     // interpret
