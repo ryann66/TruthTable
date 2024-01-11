@@ -3,6 +3,7 @@
 
 #include "tokens.h"
 #include "parser.h"
+#include "interpreter.h"
 #include "errorHandler.h"
 
 using std::queue;
@@ -13,7 +14,7 @@ using std::endl;
 
 int main(int argc, char** argv) {
     if (argc != 2) {
-        cerr << "Usage: " << argv[0] << " <logical statement>" << endl;
+        cerr << "Usage: " << argv[0] << " <logical proposition>" << endl;
         return EXIT_FAILURE;
     }
     setInputString(argv[1]);
@@ -32,13 +33,8 @@ int main(int argc, char** argv) {
     }
 
     // interpret
-    
-
-    // print (temp)
-    while (!reversepolish.empty()) {
-        cout << reversepolish.front();
-        reversepolish.pop();
+    if (printTruthTable(reversepolish, variables)){
+        return EXIT_SUCCESS;
     }
-    cout << endl;
-    return EXIT_SUCCESS;
+    return EXIT_FAILURE;
 }
