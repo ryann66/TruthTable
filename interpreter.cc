@@ -9,6 +9,12 @@
 #include "bitSequence.h"
 #include "errorHandler.h"
 
+#define V_SEP " | "
+#define OUTPUT_NAME "out"
+#define H_BAR "-"
+#define H_BAR_V_SEP "-+-"
+#define H_BAR_OUTPUT "---"
+
 using std::queue;
 using std::set;
 using std::stack;
@@ -35,11 +41,13 @@ bool printTruthTable(queue<Token> prop, set<char> vars) {
 
     // add variable definitions
     size_t rows = pow(2, vars.size());
-    size_t altlen = rows;
-    for (char c : vars) {
-        altlen /= 2;
-        BitSequence bs(rows, altlen);
-        varMap[c] = bs;
+    {
+        size_t altlen = rows;
+        for (char c : vars) {
+            altlen /= 2;
+            BitSequence bs(rows, altlen);
+            varMap[c] = bs;
+        }
     }
 
     // interpret
@@ -134,8 +142,44 @@ bool printTruthTable(queue<Token> prop, set<char> vars) {
         }
         prop.pop();
     }
+    if (stk.empty()) {
+        printError("Internal error: empty stack", prop.front());
+        return false;
+    }
+    if (stk.size() > 1) {
+        printError("Internal error: more than one element remaining on stack");
+        return false;
+    }
 
+    // generate header and array of sequences
+    size_t nCols = vars.size() + 1;
+    BitSequence* seqs = new BitSequence[nCols];
+    {
+        BitSequence* tmp = seqs;
+        for (char c : vars) {
+            *tmp = varMap[c];
+            tmp++;
+            cout << c << V_SEP;
+        }
+        *tmp = stk.top();
+        stk.pop();
+        cout << OUTPUT_NAME << endl;
+    }
 
-    // TODO
-    return false;
+    // print separator
+    for (size_t i = 0; i < vars.size(); i++) {
+        cout << H_BAR << H_BAR_V_SEP;
+    }
+    cout << H_BAR_OUTPUT << endl;
+
+    // print table
+    for (size_t i = 0; i < rows; i++) {
+        cout << seqs[0][i];
+        for (size_t j = 1; j < nCols; j++) {
+            cout << V_SEP << seqs[j][i];
+        }
+        cout << endl;
+    }
+
+    return true;
 }

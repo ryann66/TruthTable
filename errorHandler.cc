@@ -22,6 +22,10 @@ void setInputString(const char* inputString) {
     input_string = inputString;
 }
 
+void printError(const string& message) {
+    printString(message.c_str());
+}
+
 void printError(const char* message, unsigned char loc) {
     // print line 1
     int len = printString(message);

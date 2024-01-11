@@ -9,6 +9,9 @@ using std::string;
 // sets the input string for all errors to be printed against
 void setInputString(const char* inputString);
 
+// prints an error message
+void printError(const string& message);
+
 // prints an error message, highlighting where the error occured in the original input string
 void printError(const char* message, unsigned char loc);
 

@@ -17,7 +17,7 @@ tokens.o: tokens.cc tokens.h errorHandler.h
 parser.o: parser.cc parser.h tokens.h errorHandler.h
 	$(CC) $(CFLAGS) -c $<
 
-interpreter.o: interpreter.cc interpreter.h tokens.h bitSequence.h
+interpreter.o: interpreter.cc interpreter.h tokens.h bitSequence.h errorHandler.h
 	$(CC) $(CFLAGS) -c $<
 	
 errorHandler.o: errorHandler.cc errorHandler.h tokens.h bufferedErrorStream.h
