@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstddef>
+
 typedef unsigned long long int longByte;
 
 class BitSequence {
@@ -18,16 +20,16 @@ public:
 
     // indexes into the bit sequence to get the value of an individual bit
     // zero based indexing
-    bool operator[] (size_t bit);
+    bool operator[] (size_t bit) const;
 
 private:
     // number of bits in array
     size_t len;
-    longByte bits[];
+    longByte* bits;
 
-    friend longByte operator| (const longByte lhs&, const longByte rhs&);
+    friend BitSequence operator| (const BitSequence& lhs, const BitSequence& rhs);
 
-    friend longByte operator& (const longByte lhs&, const longByte rhs&);
+    friend BitSequence operator& (const BitSequence& lhs, const BitSequence& rhs);
 
-    friend longByte operator~ (const longByte lb&);
+    friend BitSequence operator~ (const BitSequence& lb);
 };
