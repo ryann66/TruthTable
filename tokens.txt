@@ -1,0 +1,49 @@
+This document contains a guide to the symbols that are recognized in each style
+Note: not all symbols are representable in every style
+Note: All styles can recognize all types of parenthesis
+
+Default:
+Not (!/~/-), And (&&/&/*), Or (||/|/+), XOR (^), Implication (->), Biconditional (=/<->)
+
+Logical:
+Not (-), And (^), Or (v/V), XOR (+), Implication (->), Biconditional (<->)
+
+Boolean:
+Not (-), And (*), Or (+), XOR (^), Biconditional (=)
+
+CStyle:
+Not (~/!), And (&/&&), Or (|/||), XOR (^), Biconditional (=)
+
+
+Internal representations of each symbol
+! Default/Not
+~ CStyle/Not
+- Logical/Not, Boolean/Not
+&& Default/And
+& CStyle/And
+* Boolean/And
+|| Default/Or
+| CStyle/Or
++ Boolean/Or, Logical/XOR
+^ Default/XOR, Logical/And, Boolean/XOR, CStyle/XOR
+-> Default/Implication, Logical/Implication
+= Default/Biconditional, Boolean/Biconditional, CStyle/Biconditional
+<-> Logical/Biconditional
+v Logical/Or
+
+Symbols of each internal representation
+Note: blank spaces correspond to invalid states
+     De  Lo  BA  CS
+Not  !   -   -   ~ 
+And  &&  ^   *   & 
+Or   ||  v   +   | 
+Xor  ^   +   ^   ^ 
+Imp  ->  ->        
+Bic  =  <->  =   = 
+([{  (       [   {
+)]}  )       ]   }
+
+Parenthesis internal representations
+() Default
+[] Boolean
+{} CStyle

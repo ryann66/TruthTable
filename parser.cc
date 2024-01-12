@@ -41,7 +41,7 @@ queue<Token> parseToRPN(queue<Token>& tokenlist) {
             case Close:
             {
                 if (shunt.empty()) {
-                    printError("Unmatched ')'", next);
+                    printError("Unmatched '" + printToken(next) + "'", next);
                     goto error;
                 }
                 Token t = shunt.top();
@@ -50,7 +50,7 @@ queue<Token> parseToRPN(queue<Token>& tokenlist) {
                     shunt.pop();
                     polish.push(t);
                     if (shunt.empty()) {
-                        printError("Unmatched ')'", next);
+                        printError("Unmatched '" + printToken(next) + "'", next);
                         goto error;
                     }
                 }
@@ -71,7 +71,7 @@ queue<Token> parseToRPN(queue<Token>& tokenlist) {
     // clear any remaining operators
     while (!shunt.empty()) {
         if (shunt.top().type == OpenParen) {
-            printError("Unmatched '('", shunt.top());
+            printError("Unmatched '" + printToken(shunt.top()) + "'", shunt.top());
             goto error;
         }
         polish.push(shunt.top());
