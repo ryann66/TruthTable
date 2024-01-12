@@ -118,6 +118,23 @@ bool printTruthTable(queue<Token> prop, set<char> vars) {
             stk.push(bs1 | bs2);
             break;
         }
+        case Xor:
+        {
+            if (stk.empty()) {
+                printError("Internal error: empty stack", prop.front());
+                return false;
+            }
+            BitSequence bs1(stk.top());
+            stk.pop();
+            if (stk.empty()) {
+                printError("Internal error: empty stack", prop.front());
+                return false;
+            }
+            BitSequence bs2(stk.top());
+            stk.pop();
+            stk.push(bs1 ^ bs2);
+            break;
+        }
         case Implication:
         {
             // A->B = ~AvB

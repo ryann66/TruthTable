@@ -98,6 +98,7 @@ SimplifiedType categorizeToken(Token t) {
         return UnaryOperator;
     case And:
     case Or:
+    case Xor:
     case Implication:
     case Biconditional:
         return BinaryOperator;

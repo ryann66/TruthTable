@@ -112,7 +112,6 @@ bool matchToken (const char* str, Style style, TokenMatch* ret) {
         }
         break;
     default:
-        ret->length = 1;
         switch (*str) {
         case '!':
             ret->style = Default;
