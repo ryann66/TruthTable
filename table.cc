@@ -12,6 +12,7 @@ using std::cout;
 using std::cerr;
 using std::endl;
 
+// todo advanced option selection
 int main(int argc, char** argv) {
     if (argc != 2) {
         cerr << "Usage: " << argv[0] << " <logical proposition>" << endl;

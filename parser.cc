@@ -23,9 +23,18 @@ SimplifiedType categorizeToken(Token t);
 // returns false if error found, else true
 bool invalidProgram(queue<Token>& tokenlist);
 
+// checks if the parenthesis are evenly matched
+// prints out errors as found
+// returns false if error found, else true
+bool invalidParenthesis(queue<Token> tokenlist);
+
+// todo enable multiple program parsing
+// todo enable evaluating programs without variables
 queue<Token> parseToRPN(queue<Token>& tokenlist) {
     if (tokenlist.empty()) return tokenlist;
-    queue<Token> polish, orig(tokenlist);
+    queue<Token> polish;
+    if (invalidParenthesis(tokenlist)) return polish;
+    queue<Token> orig(tokenlist);
     stack<Token> shunt;
     while (!tokenlist.empty()) {
         Token next = tokenlist.front();
@@ -193,4 +202,28 @@ bool invalidProgram(queue<Token>& tokenlist) {
     }
 
     return buggy;
+}
+
+// todo add some prediction e.g. "([)" should identify the middle character as the unmatched parenthesis
+bool invalidParenthesis(queue<Token> tokenlist) {
+    stack<Token> stk;
+    while (!tokenlist.empty()) {
+        Token t = tokenlist.front();
+        tokenlist.pop();
+        if (t.type == OpenParen) {
+            stk.push(t);
+        } else if (t.type == CloseParen) {
+            if (stk.top().style != t.style) {
+                printError("Unmatched '" + printToken(t) + "'", t);
+                return true;
+            }
+            stk.pop();
+        }
+    }
+    if (stk.empty()) return false;
+    do {
+        printError("Unmatched '" + printToken(stk.top()) + "'", stk.top());
+        stk.pop();
+    } while (!stk.empty());
+    return true;
 }
