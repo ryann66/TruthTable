@@ -48,7 +48,80 @@ ostream& operator<<(ostream& os, const Token t) {
 }
 
 string printToken(Token t) {
-    // todo
+    switch (t.type) {
+    case Not:
+        switch (t.style) {
+        case Default:
+            return "!";
+        case Logical:
+        case Boolean:
+            return "-";
+        case CStyle:
+            return "~";
+        }
+    case And:
+        switch (t.style) {
+        case Default:
+            return "&&";
+        case Logical:
+            return "^";
+        case Boolean:
+            return "*";
+        case CStyle:
+            return "&";
+        }
+    case Or:
+        switch (t.style) {
+        case Default:
+            return "||";
+        case Logical:
+            return "v";
+        case Boolean:
+            return "+";
+        case CStyle:
+            return "|";
+        }
+    case Xor:
+        switch (t.style) {
+        case Logical:
+            return "+";
+        case Default:
+        case Boolean:
+        case CStyle:
+            return "^";
+        }
+    case Implication:
+        if (t.style == Default || t.style == Logical)
+            return "->";
+    case Biconditional:
+        switch (t.style) {
+        case Logical:
+            return "<->";
+        case Default:
+        case Boolean:
+        case CStyle:
+            return "=";
+        }
+    case OpenParen:
+        switch (t.style) {
+        case Default:
+            return "(";
+        case Boolean:
+            return "[";
+        case CStyle:
+            return "{";
+        }
+    case CloseParen:
+        switch (t.style) {
+        case Default:
+            return ")";
+        case Boolean:
+            return "]";
+        case CStyle:
+            return "}";
+        }
+    }
+    printError("Internal error: illegal token state");
     return "";
 }
 
