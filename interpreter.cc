@@ -1,8 +1,10 @@
+#include <vector>
 #include <queue>
 #include <set>
 #include <stack>
 #include <map>
 #include <iostream>
+#include <cmath>
 
 #include "interpreter.h"
 #include "tokens.h"
@@ -10,11 +12,13 @@
 #include "errorHandler.h"
 
 #define V_SEP " | "
-#define OUTPUT_NAME "out"
 #define H_BAR "-"
+#define FILLER " "
 #define H_BAR_V_SEP "-+-"
-#define H_BAR_OUTPUT "---"
 
+#define N_DIGITS(x) ((unsigned char)((x ? floor(log10(abs((float) (x)))) : 1) + 1))
+
+using std::vector;
 using std::queue;
 using std::set;
 using std::stack;
@@ -28,57 +32,75 @@ size_t pow(size_t base, size_t power) {
     return ret;
 }
 
-bool printTruthTable(queue<Token> prop, set<char> vars) {
-    // p = 00001111
-    // q = 00110011
-    // r = 01010101
-    // (res) = ????????
-    // run simd* instructions on all of these at the same time
-    if (prop.empty()) return false;
+// evaluates (and consumes) the given proposition in the given variable environment (varMap)
+BitSequence evaluate (queue<Token>& prop, const map<char, BitSequence>& varMap);
 
+// prints a truth table with the given variables and results (numbered 1-n)
+// each BitSequence must have the specified number of rows
+void printTruthTable (const map<char, BitSequence>& vars, const vector<BitSequence>& results, size_t nRows);
+
+// prints out each of the given results
+// each result must have a length of 1
+void printStaticEvalResults (const vector<BitSequence>& results);
+
+bool interpretPropositions (vector<queue<Token>> props, set<char> vars) {
+    if (props.empty()) return false;
     map<char, BitSequence> varMap;  // vars to values
-    stack<BitSequence> stk;  // interpreting stack
+    size_t rows;  // length of sequences
 
-    // remove special variables from vars
-    bool zero = vars.erase('0'), one = vars.erase('1');
-    if (vars.empty()) {
-        printError("No variables detected!");
-        return false;
-    }
-
-    // add variable definitions
-    size_t rows = pow(2, vars.size());
+    // build var map
     {
-        size_t altlen = rows;
-        for (char c : vars) {
-            altlen /= 2;
-            BitSequence bs(rows, altlen);
-            varMap[c] = bs;
+        // remove special variables from vars
+        bool zero = vars.erase('0'), one = vars.erase('1');
+        rows = pow(2, vars.size());
+        
+        // add special variables to var mapping
+        if (zero & one) {
+            BitSequence bs(rows, 0);
+            varMap['0'] = bs;
+            varMap['1'] = ~bs;
+        } else {
+            if (zero) varMap['0'] = BitSequence(rows, 0);
+            if (one) varMap['1'] = ~BitSequence(rows, 0);
         }
-    }
 
-    // add special variables to var mapping
-    if (zero & one) {
-        BitSequence bs(rows, 0);
-        varMap['0'] = bs;
-        varMap['1'] = ~bs;
+        // add normal variable definitions
+        {
+            size_t altlen = rows;
+            for (char c : vars) {
+                altlen /= 2;
+                BitSequence bs(rows, altlen);
+                varMap[c] = bs;
+            }
+        } 
+    }
+    
+    // interpret everything
+    vector<BitSequence> res;
+    for (int i = 0; i < props.size(); i++) {
+        res.push_back(evaluate(props[i], varMap));
+    }
+    
+    // check if evaluating or building truth table
+    if (vars.empty()) {
+        printStaticEvalResults(res);
     } else {
-        if (zero) varMap['0'] = BitSequence(rows, 0);
-        if (one) varMap['1'] = ~BitSequence(rows, 0);
+        printTruthTable(varMap, res, rows);
     }
 
-    // interpret
+    return true;
+}
+
+BitSequence evaluate (queue<Token>& prop, const map<char, BitSequence>& varMap) {
+    stack<BitSequence> stk;
+
     while (!prop.empty()) {
         switch (prop.front().type) {
         case Variable:
-            stk.push(varMap[prop.front().opt]);
+            stk.push(const_cast<map<char, BitSequence>&>(varMap)[prop.front().opt]);
             break;
         case Not:
         {
-            if (stk.empty()) {
-                printError("Internal error: empty stack", prop.front());
-                return false;
-            }
             BitSequence bs(~stk.top());
             stk.pop();
             stk.push(bs);
@@ -86,16 +108,8 @@ bool printTruthTable(queue<Token> prop, set<char> vars) {
         }
         case And:
         {
-            if (stk.empty()) {
-                printError("Internal error: empty stack", prop.front());
-                return false;
-            }
             BitSequence bs1(stk.top());
             stk.pop();
-            if (stk.empty()) {
-                printError("Internal error: empty stack", prop.front());
-                return false;
-            }
             BitSequence bs2(stk.top());
             stk.pop();
             stk.push(bs1 & bs2);
@@ -103,16 +117,8 @@ bool printTruthTable(queue<Token> prop, set<char> vars) {
         }
         case Or:
         {
-            if (stk.empty()) {
-                printError("Internal error: empty stack", prop.front());
-                return false;
-            }
             BitSequence bs1(stk.top());
             stk.pop();
-            if (stk.empty()) {
-                printError("Internal error: empty stack", prop.front());
-                return false;
-            }
             BitSequence bs2(stk.top());
             stk.pop();
             stk.push(bs1 | bs2);
@@ -120,16 +126,8 @@ bool printTruthTable(queue<Token> prop, set<char> vars) {
         }
         case Xor:
         {
-            if (stk.empty()) {
-                printError("Internal error: empty stack", prop.front());
-                return false;
-            }
             BitSequence bs1(stk.top());
             stk.pop();
-            if (stk.empty()) {
-                printError("Internal error: empty stack", prop.front());
-                return false;
-            }
             BitSequence bs2(stk.top());
             stk.pop();
             stk.push(bs1 ^ bs2);
@@ -138,16 +136,8 @@ bool printTruthTable(queue<Token> prop, set<char> vars) {
         case Implication:
         {
             // A->B = ~AvB
-            if (stk.empty()) {
-                printError("Internal error: empty stack", prop.front());
-                return false;
-            }
             BitSequence rhs(stk.top());
             stk.pop();
-            if (stk.empty()) {
-                printError("Internal error: empty stack", prop.front());
-                return false;
-            }
             BitSequence lhs(~stk.top());
             stk.pop();
             stk.push(lhs | rhs);
@@ -155,65 +145,78 @@ bool printTruthTable(queue<Token> prop, set<char> vars) {
         }
         case Biconditional:
         {
-            if (stk.empty()) {
-                printError("Internal error: empty stack", prop.front());
-                return false;
-            }
             BitSequence bs1(stk.top());
             stk.pop();
-            if (stk.empty()) {
-                printError("Internal error: empty stack", prop.front());
-                return false;
-            }
             BitSequence bs2(stk.top());
             stk.pop();
             stk.push(~(bs1 ^ bs2));
             break;
         }
-        default:
-            printError("Internal error: unexpected token '" + printToken(prop.front()) + "'", prop.front());
-            return false;
         }
         prop.pop();
     }
-    if (stk.empty()) {
-        printError("Internal error: empty stack", prop.front());
-        return false;
-    }
-    if (stk.size() > 1) {
-        printError("Internal error: more than one element remaining on stack");
-        return false;
-    }
 
+    BitSequence bs(stk.top());
+    return bs;
+}
+
+void printTruthTable (const map<char, BitSequence>& vars, const vector<BitSequence>& results, size_t nRows) {
     // generate header and array of sequences
-    size_t nCols = vars.size() + 1;
-    BitSequence* seqs = new BitSequence[nCols];
-    {
-        BitSequence* tmp = seqs;
-        for (char c : vars) {
-            *tmp = varMap[c];
-            tmp++;
-            cout << c << V_SEP;
-        }
-        *tmp = stk.top();
-        stk.pop();
-        cout << OUTPUT_NAME << endl;
+    size_t nCols = vars.size() + results.size();
+    vector<BitSequence> seqs;
+    seqs.reserve(nCols);
+    vector<unsigned char> lens;
+    lens.reserve(nCols);
+    int index = 0;
+    for (auto& pair : vars) {
+        cout << pair.first << V_SEP;
+        //seqs[index] = pair.second;
+        seqs.push_back(pair.second);
+        //lens[index] = 1;
+        lens.push_back(1);
+        index++;
     }
+    for (int i = 0; i < results.size() - 1; i++) {
+        cout << (i + 1) << V_SEP;
+        //seqs[index] = results[i];
+        seqs.push_back(results[i]);
+        //lens[index] = N_DIGITS(i + 1);
+        lens.push_back(N_DIGITS(i + 1));
+        index++;
+    }
+    cout << results.size() << endl;
+    //seqs[index] = results[results.size() - 1];
+    seqs.push_back(results[results.size() - 1]);
+    //lens[index] = N_DIGITS(results.size());
+    lens.push_back(N_DIGITS(results.size()));
 
     // print separator
-    for (size_t i = 0; i < vars.size(); i++) {
-        cout << H_BAR << H_BAR_V_SEP;
+    for (size_t i = 0; i < nCols - 1; i++) {
+        for (int j = 0; j < lens[i]; j++)
+            cout << H_BAR;
+        cout << H_BAR_V_SEP;
+        lens[i]--;
     }
-    cout << H_BAR_OUTPUT << endl;
+    for (int j = -1; j < lens[nCols - 1]; j++) {
+        cout << H_BAR;
+    }
+    cout << endl;
+    lens[nCols - 1]--;
 
     // print table
-    for (size_t i = 0; i < rows; i++) {
+    for (size_t i = 0; i < nRows; i++) {
         cout << seqs[0][i];
         for (size_t j = 1; j < nCols; j++) {
-            cout << V_SEP << seqs[j][i];
+            cout << V_SEP;
+            for (int k = 0; k < lens[j]; k++) cout << FILLER;
+            cout << seqs[j][i];
         }
         cout << endl;
     }
+}
 
-    return true;
+void printStaticEvalResults (const vector<BitSequence>& results) {
+    for (int i = 0; i < results.size(); i++) {
+        cout << results[i][0] << endl;
+    }
 }

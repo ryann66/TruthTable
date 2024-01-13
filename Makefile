@@ -8,7 +8,7 @@ all: table
 table: $(OBJS)
 	$(CC) $(CFLAGS) -o table $(OBJS)
 
-table.o: table.cc tokens.h parser.h errorHandler.h
+table.o: table.cc tokens.h parser.h interpreter.h
 	$(CC) $(CFLAGS) -c $<
 
 tokens.o: tokens.cc tokens.h errorHandler.h tokenMatcher.h

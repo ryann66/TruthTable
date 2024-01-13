@@ -14,7 +14,7 @@ using std::string;
 
 queue<Token> tokenize(const char* input, set<char>& variables, Style style) {
     queue<Token> ret;
-    variables.clear();
+    setInputString(input);
     unsigned char len = 0;  // char counter
     while (*input) {
         TokenMatch res;
@@ -38,7 +38,6 @@ queue<Token> tokenize(const char* input, set<char>& variables, Style style) {
 error:
     printError("Unknown operator", len);
     while (!ret.empty()) ret.pop();
-    variables.clear();
     return ret;
 }
 

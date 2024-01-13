@@ -30,7 +30,8 @@ bool invalidParenthesis(queue<Token> tokenlist);
 
 // todo enable multiple program parsing
 // todo enable evaluating programs without variables
-queue<Token> parseToRPN(queue<Token>& tokenlist) {
+queue<Token> parseToRPN(queue<Token>& tokenlist, const char* inputString) {
+    setInputString(inputString);
     if (tokenlist.empty()) return tokenlist;
     queue<Token> polish;
     if (invalidParenthesis(tokenlist)) return polish;

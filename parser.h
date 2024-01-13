@@ -10,4 +10,4 @@ using std::queue;
 // consumes the queue tokenlist
 // uses the shunting yard algorithm
 // returns an empty queue on error
-queue<Token> parseToRPN(queue<Token>& tokenlist);
+queue<Token> parseToRPN(queue<Token>& tokenlist, const char* inputString);

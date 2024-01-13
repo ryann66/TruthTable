@@ -1,50 +1,77 @@
 #include <iostream>
 #include <cstdlib>
+#include <vector>
 
 #include "tokens.h"
 #include "parser.h"
 #include "interpreter.h"
-#include "errorHandler.h"
 
 using std::queue;
+using std::vector;
 using std::set;
+using std::string;
 using std::cout;
 using std::cerr;
 using std::endl;
 
 // todo advanced option selection
 int main(int argc, char** argv) {
-    if (argc != 2) {
-        cerr << "Usage: " << argv[0] << " <logical proposition>" << endl;
+    if (argc < 2) {
+        cerr << "Usage: " << argv[0] << " <option> <logical proposition>" << endl;
         return EXIT_FAILURE;
     }
-    setInputString(argv[1]);
 
-    // tokenize
+    // Parse options and tokenize
+    Style style = Default;
     set<char> variables;
-    queue<Token> tokenlist = tokenize(argv[1], variables);
-    if (tokenlist.empty()) {
-        return EXIT_FAILURE;
+    vector<queue<Token>> tokenLists;
+    vector<const char*> inputStrings;
+    for (int i = 1; i < argc; i++) {
+        // look for an option flag followed by a single character
+        if ((argv[i][0] == '-' || argv[i][0] == '/' || argv[i][0] == '\\') && argv[i][1] && !argv[i][2]) {
+            switch (argv[i][1]) {
+                case 'h':
+                case '?':
+                    // help
+                    continue;
+                case 'l':
+                    // logical
+                    style = Logical;
+                    continue;
+                case 'b':
+                    // boolean
+                    style = Boolean;
+                    continue;
+                case 'c':
+                    // cstyle
+                    style = CStyle;
+                    continue;
+                case 'd':
+                    // default
+                    style = Default;
+                    continue;
+            }
+        }
+        // assume not option, tokenize
+        tokenLists.push_back(tokenize(argv[i], variables, style));
+        inputStrings.push_back(argv[i]);
+    }
+    // check tokenize success
+    for (auto& tl : tokenLists) {
+        if (tl.empty()) return EXIT_FAILURE;
     }
 
     // parse
-    queue<Token> reversepolish = parseToRPN(tokenlist);
-    if (reversepolish.empty()) {
-        return EXIT_FAILURE;
+    for (int i = 0; i < tokenLists.size(); i++) {
+        tokenLists[i] = parseToRPN(tokenLists[i], inputStrings[i]);
     }
-
-    #ifdef DEBUG_PARSER
-    // print parser output
-    queue<Token> tmp(reversepolish);
-    while (!tmp.empty()) {
-        cout << printToken(tmp.front());
-        tmp.pop();
+    // check parse success
+    for (auto& tl : tokenLists) {
+        if (tl.empty()) return EXIT_FAILURE;
     }
-    cout << endl << endl;
-    #endif
 
     // interpret
-    if (printTruthTable(reversepolish, variables)){
+    if (interpretPropositions(tokenLists, variables)){
         return EXIT_SUCCESS;
     }
     return EXIT_FAILURE;
