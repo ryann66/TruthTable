@@ -12,6 +12,9 @@ using std::queue;
 using std::ostream;
 using std::string;
 
+// inserts the default operator type between all duplicate variable tokens
+void insertDefaultOperator(queue<Token>& tokenlist, Type type, Style style);
+
 queue<Token> tokenize(const char* input, set<char>& variables, Style style) {
     queue<Token> ret;
     setInputString(input);
@@ -34,9 +37,11 @@ queue<Token> tokenize(const char* input, set<char>& variables, Style style) {
             len++;
         }
     }
+
+    if (style == Boolean) insertDefaultOperator(ret, And, Boolean);
     return ret;
 error:
-    printError("Unknown operator", len);
+    printError("Unknown operator", len + 1);
     while (!ret.empty()) ret.pop();
     return ret;
 }
@@ -128,4 +133,22 @@ unsigned char tokenLength(Token t) {
     if (t.type == Implication || t.style == Default && (t.type == And || t.type == Or)) return 2;
     if (t.type == Biconditional && t.style == Logical) return 3;
     return 1;
+}
+
+void insertDefaultOperator(queue<Token>& tokenlist, Type type, Style style) {
+    if (tokenlist.empty()) return;
+    queue<Token> tmp;
+    tokenlist.swap(tmp);
+    Type last = tmp.front().type;
+    tokenlist.push(tmp.front());
+    tmp.pop();
+    while (!tmp.empty()) {
+        if (last == Variable && tmp.front().type == Variable) {
+            tokenlist.emplace(type, style, tmp.front().loc);
+        }
+        last = tmp.front().type;
+        tokenlist.push(tmp.front());
+        tmp.pop();
+    }
+
 }
