@@ -3,16 +3,16 @@ Note: not all symbols are representable in every style
 Note: All styles can recognize all types of parenthesis
 
 Default:
-Not (!/~/-), And (&&/&/*), Or (||/|/+), XOR (^), Implication (->), Biconditional (=/<->)
+Not (!/~/-), And (&&/&/*), Or (||/|/+), XOR (^), Implication (->), Equivalent (=/<->)
 
 Logical:
 Not (-), And (^), Or (v/V), XOR (+), Implication (->), Biconditional (<->)
 
 Boolean:
-Not (-), And (*), Or (+), XOR (^), Biconditional (=)
+Not (-), And (*), Or (+), XOR (^), Equivalent (=)
 
 CStyle:
-Not (~/!), And (&/&&), Or (|/||), XOR (^), Biconditional (=)
+Not (~/!), And (&/&&), Or (|/||), XOR (^), Equivalent (=)
 
 
 Internal representations of each symbol
