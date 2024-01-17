@@ -1,6 +1,12 @@
 CC = g++
-CFLAGS = -g
+CFLAGS = 
 OBJS = table.o tokens.o parser.o errorHandler.o bufferedErrorStream.o interpreter.o bitSequence.o tokenMatcher.o
+DFLAGS = -g
+
+debug: override CFLAGS+=$(DFLAGS)
+debug: all
+
+build: all
 
 all: table
 
@@ -27,10 +33,10 @@ bufferedErrorStream.o: bufferedErrorStream.c bufferedErrorStream.h
 	gcc $(CFLAGS) -c $<
 
 bitSequence.o: bitSequence.cc bitSequence.h
-	gcc $(CFLAGS) -c $<
+	$(CC) $(CFLAGS) -c $<
 
 tokenMatcher.o: tokenMatcher.cc tokenMatcher.h
-	gcc $(CFLAGS) -c $<
+	$(CC) $(CFLAGS) -c $<
 
 errorHandler.h: tokens.h
 interpreter.h: tokens.h
