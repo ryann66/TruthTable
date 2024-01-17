@@ -69,7 +69,7 @@ queue<Token> parseToRPN(queue<Token>& tokenlist, const char* inputString) {
             }
             case BinaryOperator:
             {
-                while (!shunt.empty() && shunt.top().type != OpenParen && shunt.top().opt >= next.opt) {
+                while (!shunt.empty() && shunt.top().type != OpenParen && shunt.top().opt > next.opt) {
                     polish.push(shunt.top());
                     shunt.pop();
                 }

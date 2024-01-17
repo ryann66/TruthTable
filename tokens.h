@@ -37,10 +37,10 @@ public:
                 opt = UCHAR_MAX;
                 break;
             case Xor:
-                opt = 5;
+                opt = 4;
                 break;
             case And:
-                opt = 4;
+                opt = 5;
                 break;
             case Or:
                 opt = 3;
