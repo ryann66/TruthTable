@@ -15,6 +15,32 @@ using std::string;
 // inserts the default operator type between all duplicate variable tokens
 void insertDefaultOperator(queue<Token>& tokenlist, Type type, Style style);
 
+Token::Token(const Type t, const Style s, const unsigned char l) : type(t), loc(l), style(s) {
+    switch (t) {
+        case Not: // all unary operators
+            opt = UCHAR_MAX;
+            break;
+        case Xor:
+            opt = 4;
+            break;
+        case And:
+            opt = 5;
+            break;
+        case Or:
+            opt = 3;
+            break;
+        case Implication:
+            opt = 2;
+            break;
+        case Biconditional:
+            opt = 1;
+            break;
+    }
+    // default leave opt unused
+}
+
+Token::Token(const char v, const unsigned char l) : type(Variable), opt(v), loc(l) { }
+
 queue<Token> tokenize(const char* input, set<char>& variables, Style style) {
     queue<Token> ret;
     setInputString(input);
@@ -22,7 +48,7 @@ queue<Token> tokenize(const char* input, set<char>& variables, Style style) {
     while (*input) {
         TokenMatch res;
         if (matchToken(input, style, &res)) {
-            // assorted token
+            // assorted tokens
             ret.emplace(res.type, res.style, len + 1);
             len += res.length;
             input += res.length;

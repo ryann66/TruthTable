@@ -31,32 +31,10 @@ public:
     unsigned char opt, loc;
 
     // assign type and autogen precedence
-    Token(const Type t, const Style s, const unsigned char l) : type(t), loc(l), style(s) {
-        switch (t) {
-            case Not: // all unary operators
-                opt = UCHAR_MAX;
-                break;
-            case Xor:
-                opt = 4;
-                break;
-            case And:
-                opt = 5;
-                break;
-            case Or:
-                opt = 3;
-                break;
-            case Implication:
-                opt = 2;
-                break;
-            case Biconditional:
-                opt = 1;
-                break;
-        }
-        // default leave opt unused
-    }
+    Token(const Type t, const Style s, const unsigned char l);
 
     // type must be variable (assumed), assign var name to opt
-    Token(const char v, const unsigned char l) : type(Variable), opt(v), loc(l) { }
+    Token(const char v, const unsigned char l);
 };
 
 std::ostream& operator<<(std::ostream& os, const Token);
