@@ -3,7 +3,7 @@
 #include <set>
 #include <stack>
 #include <map>
-#include <iostream>
+#include <cstdio>
 #include <cmath>
 
 #include "interpreter.h"
@@ -15,6 +15,7 @@
 #define H_BAR "-"
 #define FILLER " "
 #define H_BAR_V_SEP "-+-"
+#define NEWLINE "\n"
 
 #define N_DIGITS(x) ((unsigned char)((x ? floor(log10(abs((float) (x)))) : 1) + 1))
 
@@ -23,8 +24,6 @@ using std::queue;
 using std::set;
 using std::stack;
 using std::map;
-using std::cout;
-using std::endl;
 
 size_t pow(size_t base, size_t power) {
     size_t ret = 1;
@@ -169,54 +168,48 @@ void printTruthTable (const map<char, BitSequence>& vars, const vector<BitSequen
     lens.reserve(nCols);
     int index = 0;
     for (auto& pair : vars) {
-        cout << pair.first << V_SEP;
-        //seqs[index] = pair.second;
+        printf("%c" V_SEP, pair.first);
         seqs.push_back(pair.second);
-        //lens[index] = 1;
         lens.push_back(1);
         index++;
     }
     for (int i = 0; i < results.size() - 1; i++) {
-        cout << (i + 1) << V_SEP;
-        //seqs[index] = results[i];
+        printf("%i" V_SEP, i + 1);
         seqs.push_back(results[i]);
-        //lens[index] = N_DIGITS(i + 1);
         lens.push_back(N_DIGITS(i + 1));
         index++;
     }
-    cout << results.size() << endl;
-    //seqs[index] = results[results.size() - 1];
+    printf("%llu" NEWLINE, results.size());
     seqs.push_back(results[results.size() - 1]);
-    //lens[index] = N_DIGITS(results.size());
     lens.push_back(N_DIGITS(results.size()));
 
     // print separator
     for (size_t i = 0; i < nCols - 1; i++) {
         for (int j = 0; j < lens[i]; j++)
-            cout << H_BAR;
-        cout << H_BAR_V_SEP;
+            printf(H_BAR);
+        printf(H_BAR_V_SEP);
         lens[i]--;
     }
     for (int j = -1; j < lens[nCols - 1]; j++) {
-        cout << H_BAR;
+        printf(H_BAR);
     }
-    cout << endl;
+    printf(NEWLINE);
     lens[nCols - 1]--;
 
     // print table
     for (size_t i = 0; i < nRows; i++) {
-        cout << seqs[0][i];
+        printf("%hhu", seqs[0][i]);
         for (size_t j = 1; j < nCols; j++) {
-            cout << V_SEP;
-            for (int k = 0; k < lens[j]; k++) cout << FILLER;
-            cout << seqs[j][i];
+            printf(V_SEP);
+            for (int k = 0; k < lens[j]; k++) printf(FILLER);
+            printf("%hhu", seqs[j][i]);
         }
-        cout << endl;
+        printf(NEWLINE);
     }
 }
 
 void printStaticEvalResults (const vector<BitSequence>& results) {
     for (int i = 0; i < results.size(); i++) {
-        cout << results[i][0] << endl;
+        printf("%hhu" NEWLINE, results[i][0]);
     }
 }
