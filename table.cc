@@ -26,6 +26,7 @@ int main(int argc, char** argv) {
     }
 
     // check for help parse (must be arg 1)
+    int i = 1;
     if (argv[1][0] == '-' || argv[1][0] == '/' || argv[1][0] == '\\') {
         if ((argv[1][1] == '?' || argv[1][1] == 'h') && !argv[1][2]) {
             // print help
@@ -34,6 +35,8 @@ int main(int argc, char** argv) {
         if (argv[1][1] == 'v' && !argv[1][2]) {
             // print version
             cout << VERSION << endl;
+            if (argc > 2) cout << endl;
+            i++;
         }
     }
 
@@ -42,7 +45,7 @@ int main(int argc, char** argv) {
     set<char> variables;
     vector<queue<Token>> tokenLists;
     vector<const char*> inputStrings;
-    for (int i = 1; i < argc; i++) {
+    for (; i < argc; i++) {
         // look for an option flag followed by a single character
         if ((argv[i][0] == '-' || argv[i][0] == '/' || argv[i][0] == '\\') && argv[i][1] && !argv[i][2]) {
             switch (argv[i][1]) {
