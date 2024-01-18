@@ -6,6 +6,7 @@ DFLAGS = -g -O0
 debug: override CFLAGS+=$(DFLAGS)
 debug: all
 
+build: clean
 build: all
 
 all: table
