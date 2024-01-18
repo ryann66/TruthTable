@@ -16,12 +16,13 @@ using std::vector;
 using std::set;
 using std::string;
 using std::cout;
+using std::cerr;
 using std::endl;
 
 // todo advanced option selection
 int main(int argc, char** argv) {
     if (argc < 2) {
-        cout << "Usage: " << argv[0] << " [-option] propositions" << endl;
+        cerr << "Usage: " << argv[0] << " [-option] propositions" << endl;
         return EXIT_FAILURE;
     }
 
@@ -85,9 +86,17 @@ int main(int argc, char** argv) {
         if (tl.empty()) return EXIT_FAILURE;
     }
 
-    // interpret
-    if (interpretPropositions(tokenLists, variables)){
-        return EXIT_SUCCESS;
+    // check proposition counts
+    if (tokenLists.size() > 10) {
+        cerr << "Too many propositions! Maximum of 10 supported" << endl;
+        return EXIT_FAILURE;
     }
-    return EXIT_FAILURE;
+    // interpret
+    size_t rows;
+    vector<pair<char, BitSequence>> table = interpretPropositions(tokenLists, variables, &rows);
+    if (table.empty()) return EXIT_FAILURE;
+
+    // print table
+    // todo: print table
+    return EXIT_SUCCESS;
 }

@@ -3,19 +3,12 @@
 #include <set>
 #include <stack>
 #include <map>
-#include <cstdio>
 #include <cmath>
 
 #include "interpreter.h"
 #include "tokens.h"
 #include "bitSequence.h"
 #include "errorHandler.h"
-
-#define V_SEP " | "
-#define H_BAR "-"
-#define FILLER " "
-#define H_BAR_V_SEP "-+-"
-#define NEWLINE "\n"
 
 #define N_DIGITS(x) ((unsigned char)((x ? floor(log10(abs((float) (x)))) : 1) + 1))
 
@@ -24,6 +17,7 @@ using std::queue;
 using std::set;
 using std::stack;
 using std::map;
+using std::pair;
 
 size_t pow(size_t base, size_t power) {
     size_t ret = 1;
@@ -34,60 +28,49 @@ size_t pow(size_t base, size_t power) {
 // evaluates (and consumes) the given proposition in the given variable environment (varMap)
 BitSequence evaluate (queue<Token>& prop, const map<char, BitSequence>& varMap);
 
-// prints a truth table with the given variables and results (numbered 1-n)
-// each BitSequence must have the specified number of rows
-void printTruthTable (const map<char, BitSequence>& vars, const vector<BitSequence>& results, size_t nRows);
-
-// prints out each of the given results
-// each result must have a length of 1
-void printStaticEvalResults (const vector<BitSequence>& results);
-
-bool interpretPropositions (vector<queue<Token>> props, set<char> vars) {
-    if (props.empty()) return false;
+vector<pair<char, BitSequence>> interpretPropositions (vector<queue<Token>> props, set<char> vars, size_t* rows) {
+    if (props.empty() || props.size() > 10) return vector<pair<char, BitSequence>>();
     map<char, BitSequence> varMap;  // vars to values
-    size_t rows;  // length of sequences
 
     // build var map
     {
         // remove special variables from vars
         bool zero = vars.erase('0'), one = vars.erase('1');
-        rows = pow(2, vars.size());
+        *rows = pow(2, vars.size());
         
         // add special variables to var mapping
         if (zero & one) {
-            BitSequence bs(rows, 0);
+            BitSequence bs(*rows, 0);
             varMap['0'] = bs;
             varMap['1'] = ~bs;
         } else {
-            if (zero) varMap['0'] = BitSequence(rows, 0);
-            if (one) varMap['1'] = ~BitSequence(rows, 0);
+            if (zero) varMap['0'] = BitSequence(*rows, 0);
+            if (one) varMap['1'] = ~BitSequence(*rows, 0);
         }
 
         // add normal variable definitions
         {
-            size_t altlen = rows;
+            size_t altlen = *rows;
             for (char c : vars) {
                 altlen /= 2;
-                BitSequence bs(rows, altlen);
+                BitSequence bs(*rows, altlen);
                 varMap[c] = bs;
             }
         } 
     }
     
-    // interpret everything
-    vector<BitSequence> res;
-    for (int i = 0; i < props.size(); i++) {
-        res.push_back(evaluate(props[i], varMap));
-    }
-    
-    // check if evaluating or building truth table
-    if (vars.empty()) {
-        printStaticEvalResults(res);
-    } else {
-        printTruthTable(varMap, res, rows);
+    // add variables to table
+    vector<pair<char, BitSequence>> res;
+    for (char c : vars) {
+        res.emplace_back(c, varMap[c]);
     }
 
-    return true;
+    // evaluate props and add to table
+    for (int i = 0; i < props.size(); i++) {
+        res.emplace_back(((i + 1) % 10) + 48, evaluate(props[i], varMap));
+    }
+
+    return res;
 }
 
 BitSequence evaluate (queue<Token>& prop, const map<char, BitSequence>& varMap) {
@@ -157,59 +140,4 @@ BitSequence evaluate (queue<Token>& prop, const map<char, BitSequence>& varMap) 
 
     BitSequence bs(stk.top());
     return bs;
-}
-
-void printTruthTable (const map<char, BitSequence>& vars, const vector<BitSequence>& results, size_t nRows) {
-    // generate header and array of sequences
-    size_t nCols = vars.size() + results.size();
-    vector<BitSequence> seqs;
-    seqs.reserve(nCols);
-    vector<unsigned char> lens;
-    lens.reserve(nCols);
-    int index = 0;
-    for (auto& pair : vars) {
-        printf("%c" V_SEP, pair.first);
-        seqs.push_back(pair.second);
-        lens.push_back(1);
-        index++;
-    }
-    for (int i = 0; i < results.size() - 1; i++) {
-        printf("%i" V_SEP, i + 1);
-        seqs.push_back(results[i]);
-        lens.push_back(N_DIGITS(i + 1));
-        index++;
-    }
-    printf("%llu" NEWLINE, results.size());
-    seqs.push_back(results[results.size() - 1]);
-    lens.push_back(N_DIGITS(results.size()));
-
-    // print separator
-    for (size_t i = 0; i < nCols - 1; i++) {
-        for (int j = 0; j < lens[i]; j++)
-            printf(H_BAR);
-        printf(H_BAR_V_SEP);
-        lens[i]--;
-    }
-    for (int j = -1; j < lens[nCols - 1]; j++) {
-        printf(H_BAR);
-    }
-    printf(NEWLINE);
-    lens[nCols - 1]--;
-
-    // print table
-    for (size_t i = 0; i < nRows; i++) {
-        printf("%hhu", seqs[0][i]);
-        for (size_t j = 1; j < nCols; j++) {
-            printf(V_SEP);
-            for (int k = 0; k < lens[j]; k++) printf(FILLER);
-            printf("%hhu", seqs[j][i]);
-        }
-        printf(NEWLINE);
-    }
-}
-
-void printStaticEvalResults (const vector<BitSequence>& results) {
-    for (int i = 0; i < results.size(); i++) {
-        printf("%hhu" NEWLINE, results[i][0]);
-    }
 }
