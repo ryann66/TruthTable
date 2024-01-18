@@ -1,7 +1,7 @@
 CC = g++
-CFLAGS = 
+CFLAGS = -Os
 OBJS = table.o tokens.o parser.o errorHandler.o bufferedErrorStream.o interpreter.o bitSequence.o tokenMatcher.o
-DFLAGS = -g
+DFLAGS = -g -O0
 
 debug: override CFLAGS+=$(DFLAGS)
 debug: all
