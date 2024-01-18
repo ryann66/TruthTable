@@ -20,11 +20,11 @@ Token::Token(const Type t, const Style s, const unsigned char l) : type(t), loc(
         case Not: // all unary operators
             opt = UCHAR_MAX;
             break;
-        case Xor:
-            opt = 4;
-            break;
         case And:
             opt = 5;
+            break;
+        case Xor:
+            opt = 4;
             break;
         case Or:
             opt = 3;
