@@ -8,6 +8,7 @@
 #include "parser.h"
 #include "interpreter.h"
 
+#define VERSION "v1.0.1"
 #define INDENT "   "
 
 using std::queue;
@@ -39,6 +40,11 @@ int main(int argc, char** argv) {
                     if (i + 1 != argc) {
                         string arg(argv[i + 1]);
                         std::transform(arg.begin(), arg.end(), arg.begin(), [](unsigned char c){ return std::tolower(c); });
+                        if (arg == "version") {
+                            cout << VERSION << endl;
+                            i++;
+                            continue;
+                        }
                         if (arg == "default") {
                             // default help
                             cout << "Default Mode -d" << endl;
@@ -105,6 +111,7 @@ int main(int argc, char** argv) {
                     // -h help
                     cout << "Use " << argv[i] << " [page] to access the help pages" << endl;
                     cout << "The help pages are:" << endl;
+                    cout << INDENT "version" << endl;
                     cout << INDENT "intro" << endl;
                     cout << INDENT "default" << endl;
                     cout << INDENT "logical" << endl;

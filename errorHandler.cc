@@ -78,7 +78,7 @@ void printError(const char* message, const Token& loc) {
 void printError(const char* message, const Token& beg, const Token& end) {
     if (beg.loc > end.loc) return;
     unsigned char len = tokenLength(end);
-    printError(message, beg.loc, end.loc + len - 1);
+    printError(message, beg.loc + 1, end.loc + len);
 }
 
 void printError(const string& message, const Token& loc) {
