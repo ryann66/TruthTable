@@ -8,6 +8,7 @@
 #include "parser.h"
 #include "interpreter.h"
 #include "helper.h"
+#include "tablePrinter.h"
 
 #define VERSION "v1.0.2"
 
@@ -43,6 +44,7 @@ int main(int argc, char** argv) {
 
     // Parse options and tokenize
     Style style = Default;
+    PrintStyle pStyle = All;
     set<char> variables;
     vector<queue<Token>> tokenLists;
     vector<const char*> inputStrings;
@@ -65,6 +67,18 @@ int main(int argc, char** argv) {
                 case 'd':
                     // default
                     style = Default;
+                    continue;
+                case 'a':
+                    // all
+                    pStyle = All;
+                    continue;
+                case 'e':
+                    // emphasize
+                    pStyle = Highlight;
+                    continue;
+                case 's':
+                    // XOR (only diff)
+                    pStyle = Different;
                     continue;
             }
         }
@@ -97,6 +111,6 @@ int main(int argc, char** argv) {
     if (table.empty()) return EXIT_FAILURE;
 
     // print table
-    // todo: print table
+    printTable(table, rows, pStyle);
     return EXIT_SUCCESS;
 }

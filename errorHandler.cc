@@ -4,13 +4,10 @@
 
 #include "errorHandler.h"
 #include "tokens.h"
+#include "terminalSequences.h"
 extern "C" {
     #include "bufferedErrorStream.h"
 }
-
-#define ESCAPE "\033"
-#define RESET ESCAPE "[0m"
-#define EMPH ESCAPE "[35m"
 
 using std::string;
 using std::cerr;

@@ -27,6 +27,12 @@ public:
     // zero based indexing
     bool operator[] (size_t bit) const;
 
+    BitSequence& operator&= (const BitSequence& rhs);
+
+    BitSequence& operator|= (const BitSequence& rhs);
+
+    explicit operator bool() const;
+
 private:
     // constructs a new BitSequence with the given length of sequence but does
     // not offer any guarantee on the values of the bits

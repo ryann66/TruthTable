@@ -20,7 +20,7 @@ inline void listPages() {
     cout << INDENT "cstyle" << endl;
     cout << INDENT "operators" << endl;
     cout << INDENT "variables" << endl;
-
+    cout << INDENT "table" << endl;
 }
 
 inline void helpBasic(char* progName) {
@@ -97,6 +97,16 @@ inline void helpVariables() {
     cout << "always equal 1 (T) of 0 (F), respectively." << endl;
     cout << "If all propositions do not contain any variables, they will be" << endl;
     cout << "evaluated to a constant value (1 or 0), instead of building a table" << endl;
+}
+
+inline void helpTable() {
+    cout << "The table can be printed to showcase differences" << endl;
+    cout << "All Rows -a" << endl;
+    cout << INDENT "Prints all rows in the table (default)" << endl;
+    cout << "Emphasize Rows -e" << endl;
+    cout << INDENT "Prints all rows, but highlights rows with differences" << endl;
+    cout << "Select rows -s" << endl;
+    cout << INDENT "Prints only rows with differences" << endl;
 }
 
 bool printHelp(int argc, char** argv, char* progName) {

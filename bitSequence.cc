@@ -62,6 +62,33 @@ bool BitSequence::operator[] (size_t bit) const {
     return major & mask;
 }
 
+BitSequence& BitSequence::operator&=(const BitSequence& rhs) {
+    if (this->len != rhs.len) return *this;
+    shared_ptr<longByte> nBits(new longByte[arrlen()]);
+    for (size_t i = 0; i < this->arrlen(); i++) {
+        nBits.get()[i] = this->bits.get()[i] & rhs.bits.get()[i];
+    }
+    this->bits = nBits;
+    return *this;
+}
+
+BitSequence& BitSequence::operator|=(const BitSequence& rhs) {
+    if (this->len != rhs.len) return *this;
+    shared_ptr<longByte> nBits(new longByte[arrlen()]);
+    for (size_t i = 0; i < this->arrlen(); i++) {
+        nBits.get()[i] = this->bits.get()[i] | rhs.bits.get()[i];
+    }
+    this->bits = nBits;
+    return *this;
+}
+
+BitSequence::operator bool() const {
+    for (size_t i = 0; i < this->arrlen(); i++) {
+        if (this->bits.get()[i]) return true;
+    }
+    return false;
+}
+
 size_t BitSequence::arrlen() const {
     return len / LONG_BYTE_LEN + ((len % LONG_BYTE_LEN) ? 1 : 0);
 }
