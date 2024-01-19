@@ -10,7 +10,7 @@
 #include "helper.h"
 #include "tablePrinter.h"
 
-#define VERSION "v1.0.2"
+#define VERSION "v1.1.0"
 
 using std::queue;
 using std::vector;
